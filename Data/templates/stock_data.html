@@ -1,0 +1,30 @@
+<!-- your_template.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DataFrame Display</title>
+</head>
+<body>
+    <h1>DataFrame Display</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <!-- Display column headers -->
+                {% for column in data.0.keys %}
+                    <th>{{ column }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Display data rows -->
+            {% for row in data %}
+                <tr>
+                    {% for value in row.values %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

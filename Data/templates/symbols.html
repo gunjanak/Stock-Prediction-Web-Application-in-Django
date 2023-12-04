@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <title>Symbols</title>
+</html>
+
+<body>
+    <h1>Symbols</h1>
+    <p id="output"></p>
+
+    <script>'
+        fetch('symbols/').then(response => response.json())
+        .then(data => {
+            document.getElementById('output').innerText = JSON.stringify(data,null,2)
+
+        });
+    </script>
+</body>
