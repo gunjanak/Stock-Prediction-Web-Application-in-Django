@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=decive-width, initial-scale=1.0">
+        <title>Dropdown Menu</title>
+    </head>
+    <body>
+        <select id="stockDropdown">
+
+        </select>
+
+        <script>
+            fetch('/symbols/').then(response => response.json())
+            .then(data => {
+                var dropdown = document.getElementById("stockDropdown");
+
+                //iterate over the stocks array in the JSON response
+                for (var i=0; i< data.stocks.length; i++) {
+                    var option = document.createElement("option");
+
+                    option.value = data.stocks[i];
+                    option.text = data.stocks[i];
+
+                    //append the option to the dropdown
+                    dropdown.appendChild(option);
+
+                }
+            })
+            .catch(error => console.error("Error: ",error));
+        </script>
+    </body>
+</html>
