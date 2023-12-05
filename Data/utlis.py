@@ -42,7 +42,7 @@ def custom_business_week_mean(values):
     return working_days.mean()
 
 #function to read stock data from Nepalipaisa.com api
-def stock_dataFrame(stock_symbol,start_date='2020-01-01',weekly=False):
+def stock_dataFrame(stock_symbol,start_date='2023-07-01',weekly=False):
   """
   input : stock_symbol
             start_data set default at '2020-01-01'
