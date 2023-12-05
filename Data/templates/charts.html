@@ -25,22 +25,33 @@
         <!-- Element to display the JSON response -->
         <div id="jsonData"></div>
         <!-- Create a canvas element for the chart -->
-        <canvas id="lineChart" width="40" height="20"></canvas>
-        <canvas id="lineChart2" width="400" height="200"></canvas>
+
+        <canvas id="lineChart" width="300" height="100"></canvas>
+        
 
 
         <script>
-            const ctx = document.getElementById('lineChart2');
+            
+
+
+            const ctx = document.getElementById('lineChart');
   
             const newLineChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                labels: [],
                 datasets: [{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    borderWidth: 1
-                }]
+                    label: '',
+                    data: [],
+                    borderWidth: 3
+                },
+                {
+                    label: '',
+                    data: [],
+                    borderWidth: 3
+                },
+
+            ]
                 },
                 options: {
                 scales: {
@@ -94,6 +105,7 @@
                     document.getElementById("jsonData").innerText = JSON.stringify(json,null,2);
                     // console.log(jsonData);
                     drawChart(newLineChart,json);
+                    
 
 
                 })
@@ -118,23 +130,21 @@
                 const title = jsonData.title;
                 const labels = jsonData.data.labels;
                 const datasets = jsonData.data.datasets;
-                console.log(datasets[0].data);
+                // console.log(datasets[1]);
 
 
-                // chart.data.datasets = [];
-                // chart.data.labels = [];
 
-               
+                chart.title = title;
                 chart.data.labels = labels;
-                chart.data.datasets[0].label = title;
+                chart.data.datasets[0].label = datasets[0].label;
                 chart.data.datasets[0].data = datasets[0].data;
-                // datasets.forEach(dataset => {
-                //     chart.data.datasets.push(dataset);
-                //     console.log(dataset);
-                // });
-                // chart.data.datasets.data = [1,2,55,65,88];
+                chart.data.datasets[1].label = datasets[1].label;
+                chart.data.datasets[1].data = datasets[1].data;
+
                 chart.update();
             }
+
+    
   </script>
   
 

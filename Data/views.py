@@ -9,7 +9,7 @@ from Data.utlis import nepse_symbols,custom_business_week_mean,stock_dataFrame
 # Create your views here.
 def nepse_symbols_view(request):
     output = nepse_symbols()
-    print(output)
+    # print(output)
     context = {'stocks':output}
 
     return JsonResponse(context)
@@ -17,21 +17,22 @@ def nepse_symbols_view(request):
 def stock_dataFrame_view(request,symbol):
     df = stock_dataFrame(symbol)
     print("**************************************************")
-    print(symbol)
-    df = df.head()
+    # print(symbol)
+    df = df.head(5)
     df = df.reset_index()
     
     df['timestamp'] = pd.to_datetime(df['Date'])
     df['Date'] = df['timestamp'].dt.date
-    df = df[['Date','Close']]
+    df = df[['Date','Close','Open']]
+    print(df)
     date = list(df['Date'].values)
     close = list(df['Close'].values)
-    print(type(date))
-    print(type(close))
+    open = list(df['Open'].values)
+    
 
     #convert dataframe to a list of dictionaries
     df_dict_list = df.to_dict('records')
-    print(df_dict_list)
+  
     data = {"data":df_dict_list}
 
     context = {
@@ -39,9 +40,14 @@ def stock_dataFrame_view(request,symbol):
         "data":{
             "labels":date,
             "datasets":[{
-                "label":"Nrs",
+                "label":"Close",
                 "data":close,
-            }]
+            },
+            {
+                "label":"Open",
+                "data":open,
+            }
+            ]
         }
     }
    
