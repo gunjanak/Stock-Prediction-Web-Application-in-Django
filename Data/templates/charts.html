@@ -27,6 +27,7 @@
         <!-- Create a canvas element for the chart -->
 
         <canvas id="lineChart" width="300" height="100"></canvas>
+        <canvas id="testChart" width="300" height="100"></canvas>
         
 
 
@@ -35,31 +36,25 @@
 
 
             const ctx = document.getElementById('lineChart');
-  
-            const newLineChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                labels: [],
-                datasets: [{
-                    label: '',
-                    data: [],
-                    borderWidth: 3
-                },
-                {
-                    label: '',
-                    data: [],
-                    borderWidth: 3
-                },
+         
 
-            ]
+  
+            
+
+            const lineChart = new Chart(ctx,{
+                type:'line',
+                data:{
+                    labels:[],
+                    datasets:[]
                 },
-                options: {
-                scales: {
-                    y: {
-                    beginAtZero: false
+                options:{
+                    scales:{
+                        y:{
+                            beginAtZero:false
+                        }
                     }
                 }
-                }
+
             });
 
             //Function to populate the Dropdown with options
@@ -103,8 +98,8 @@
                     // console.log(json);
                     //Display the JSON response
                     document.getElementById("jsonData").innerText = JSON.stringify(json,null,2);
-                    // console.log(jsonData);
-                    drawChart(newLineChart,json);
+                   
+                    drawLineChart(lineChart,json);
                     
 
 
@@ -123,26 +118,27 @@
 <script>
     
 
-    function drawChart(chart,jsonData){
-                console.log("fuck");
-                // console.log(jsonData);
-                console.log(chart.data.datasets[0].label);
-                const title = jsonData.title;
-                const labels = jsonData.data.labels;
-                const datasets = jsonData.data.datasets;
-                // console.log(datasets[1]);
+  
 
+    function drawLineChart(chart,jsonData){
+        console.log("Rendering chart");
+        const title = jsonData.title;
+        const labels = jsonData.data.labels;
+        const datasets = jsonData.data.datasets;
 
+        // chart.options.title.text = title;
+        chart.data.labels = labels;
 
-                chart.title = title;
-                chart.data.labels = labels;
-                chart.data.datasets[0].label = datasets[0].label;
-                chart.data.datasets[0].data = datasets[0].data;
-                chart.data.datasets[1].label = datasets[1].label;
-                chart.data.datasets[1].data = datasets[1].data;
-
-                chart.update();
-            }
+        datasets.forEach((dataset,index)=>{
+            chart.data.datasets.push({
+                label:dataset.label,
+                data:dataset.data,
+                borderWidth:3,
+                fill:true
+            });
+        });
+        chart.update();
+    }
 
     
   </script>

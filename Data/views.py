@@ -18,14 +18,27 @@ def stock_dataFrame_view(request,symbol):
     df = stock_dataFrame(symbol)
     print("**************************************************")
     # print(symbol)
-    df = df.head(5)
+    df = df.head(50)
+    print(df)
     df = df.reset_index()
     
     df['timestamp'] = pd.to_datetime(df['Date'])
     df['Date'] = df['timestamp'].dt.date
-    df = df[['Date','Close','Open']]
-    print(df)
+    df = df[['Date','Close','Open','High',"Low"]]
+    # print(df)
     date = list(df['Date'].values)
+    new_df = df.iloc[:, 1:] 
+    print(new_df)
+    # Convert DataFrame to a list of dictionaries
+    list_of_dicts = new_df.to_dict(orient='list')
+
+    # Create the final list of dictionaries with the desired format
+    final_list_of_dicts = [{"label": column, "data": values} for column, values in list_of_dicts.items()]
+
+    # Display the final list of dictionaries
+    print(final_list_of_dicts)
+
+
     close = list(df['Close'].values)
     open = list(df['Open'].values)
     
@@ -39,15 +52,7 @@ def stock_dataFrame_view(request,symbol):
         "title":"Stock Price",
         "data":{
             "labels":date,
-            "datasets":[{
-                "label":"Close",
-                "data":close,
-            },
-            {
-                "label":"Open",
-                "data":open,
-            }
-            ]
+            "datasets":final_list_of_dicts
         }
     }
    
