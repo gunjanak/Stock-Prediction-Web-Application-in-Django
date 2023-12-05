@@ -27,7 +27,8 @@
         <!-- Create a canvas element for the chart -->
 
         <canvas id="lineChart" width="300" height="100"></canvas>
-        <canvas id="testChart" width="300" height="100"></canvas>
+        <canvas id="obvChart" width="300" height="100"></canvas>
+       
         
 
 
@@ -36,12 +37,24 @@
 
 
             const ctx = document.getElementById('lineChart');
-         
-
-  
-            
-
+        
             const lineChart = new Chart(ctx,{
+                type:'line',
+                data:{
+                    labels:[],
+                    datasets:[]
+                },
+                options:{
+                    scales:{
+                        y:{
+                            beginAtZero:false
+                        }
+                    }
+                }
+
+            });
+            const obvCtx = document.getElementById('obvChart');
+            const obvLineChart = new Chart(obvCtx,{
                 type:'line',
                 data:{
                     labels:[],
@@ -95,11 +108,15 @@
                 //Make an asynchronous request to the Django view
                 fetch(apiUrl).then(response => response.json())
                 .then(json => {
+                    console.log("fucking json");
+
                     // console.log(json);
                     //Display the JSON response
-                    document.getElementById("jsonData").innerText = JSON.stringify(json,null,2);
+
+                    // document.getElementById("jsonData").innerText = JSON.stringify(json,null,2);
                    
-                    drawLineChart(lineChart,json);
+                    drawLineChart(lineChart,json.main_data);
+                    drawObvChart(obvLineChart,json.obv);
                     
 
 
@@ -126,6 +143,10 @@
         const labels = jsonData.data.labels;
         const datasets = jsonData.data.datasets;
 
+         // Reset the current chart
+         chart.data.datasets = [];
+            chart.data.labels = [];
+
         // chart.options.title.text = title;
         chart.data.labels = labels;
 
@@ -134,7 +155,34 @@
                 label:dataset.label,
                 data:dataset.data,
                 borderWidth:3,
-                fill:true
+                fill:false
+            });
+        });
+        chart.update();
+    }
+
+
+
+    function drawObvChart(chart,jsonData){
+        console.log("Rendering chart");
+        const title = jsonData.title;
+        const labels = jsonData.data.labels;
+        const datasets = jsonData.data.datasets;
+
+         // Reset the current chart
+         chart.data.datasets = [];
+            chart.data.labels = [];
+
+        // chart.options.title.text = title;
+        chart.data.labels = labels;
+       
+
+        datasets.forEach((dataset,index)=>{
+            chart.data.datasets.push({
+                label:dataset.label,
+                data:dataset.data,
+                borderWidth:3,
+                fill:false
             });
         });
         chart.update();

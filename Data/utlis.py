@@ -42,7 +42,7 @@ def custom_business_week_mean(values):
     return working_days.mean()
 
 #function to read stock data from Nepalipaisa.com api
-def stock_dataFrame(stock_symbol,start_date='2023-07-01',weekly=False):
+def stock_dataFrame(stock_symbol,start_date='2023-01-01',weekly=False):
   """
   input : stock_symbol
             start_data set default at '2020-01-01'
@@ -84,3 +84,28 @@ def stock_dataFrame(stock_symbol,start_date='2023-07-01',weekly=False):
 
 
   return df
+
+def OBV(company_df):
+  length = len(company_df)
+  #print(length)
+  OBV = 0
+  obv_daily = []
+  for i in range(length-1):
+    if(company_df['Close'][i+1] > company_df['Close'][i]):
+      OBV = OBV + company_df['Volume'][i+1] 
+      obv_daily.append(OBV)
+    elif (company_df['Close'][i+1] < company_df['Close'][i]):
+      OBV = OBV - company_df['Volume'][i+1] 
+      obv_daily.append(OBV)
+    else:
+      OBV = OBV
+      obv_daily.append(OBV)
+  company_df2 = company_df
+  # Drop first row
+  company_df2.drop(index=company_df2.index[0], 
+        axis=0, 
+        inplace=True)
+  
+  company_df2['OBV'] = obv_daily
+  #print(len(company_df2))
+  return company_df2

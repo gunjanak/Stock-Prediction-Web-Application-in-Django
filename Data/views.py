@@ -3,7 +3,7 @@ import pandas as pd
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from Data.utlis import nepse_symbols,custom_business_week_mean,stock_dataFrame
+from Data.utlis import nepse_symbols,custom_business_week_mean,stock_dataFrame,OBV
 
 
 # Create your views here.
@@ -17,18 +17,29 @@ def nepse_symbols_view(request):
 def stock_dataFrame_view(request,symbol):
     df = stock_dataFrame(symbol)
     print("**************************************************")
-    # print(symbol)
     df = df.head(50)
-    print(df)
+    # print(df)
+
+    #the df with OBV
+    
+    df_obv = OBV(df)
+    df_obv = df_obv[['OBV']]
+    print(df_obv)
+    obv = df_obv.values
+    obv = list(df_obv.values)
+    obv = [item.item() for array in obv for item in array]
+    print(obv)
+    print(type(obv[0]))
+
+
     df = df.reset_index()
     
     df['timestamp'] = pd.to_datetime(df['Date'])
     df['Date'] = df['timestamp'].dt.date
     df = df[['Date','Close','Open','High',"Low"]]
-    # print(df)
     date = list(df['Date'].values)
     new_df = df.iloc[:, 1:] 
-    print(new_df)
+    # print(new_df)
     # Convert DataFrame to a list of dictionaries
     list_of_dicts = new_df.to_dict(orient='list')
 
@@ -39,24 +50,36 @@ def stock_dataFrame_view(request,symbol):
     print(final_list_of_dicts)
 
 
-    close = list(df['Close'].values)
-    open = list(df['Open'].values)
-    
 
-    #convert dataframe to a list of dictionaries
-    df_dict_list = df.to_dict('records')
-  
-    data = {"data":df_dict_list}
-
-    context = {
+    main_data = {
         "title":"Stock Price",
         "data":{
             "labels":date,
             "datasets":final_list_of_dicts
         }
     }
-   
-    print(context)
+
+    OBV_data = {
+        "title":"On Balance Volume",
+        "data":{
+            "labels":date,
+            "datasets":[{
+                "label":"OBV",
+                "data":obv
+
+            }
+                
+            ]
+        }
+        
+    }
+    
+    context = {
+        "main_data":main_data,
+        "obv":OBV_data
+    }
+
+    # print(context)
 
     return JsonResponse(context)
 
