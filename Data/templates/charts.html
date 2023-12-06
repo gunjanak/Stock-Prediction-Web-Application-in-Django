@@ -29,6 +29,7 @@
         <canvas id="lineChart" width="300" height="100"></canvas>
         <canvas id="obvChart" width="300" height="100"></canvas>
         <canvas id="macdChart" width="300" height="100"></canvas>
+        
        
         
 
@@ -37,56 +38,56 @@
             
 
 
-            const ctx = document.getElementById('lineChart');
+            // const ctx = document.getElementById('lineChart');
         
-            const lineChart = new Chart(ctx,{
-                type:'line',
-                data:{
-                    labels:[],
-                    datasets:[]
-                },
-                options:{
-                    scales:{
-                        y:{
-                            beginAtZero:false
-                        }
-                    }
-                }
+            // const lineChart = new Chart(ctx,{
+            //     type:'line',
+            //     data:{
+            //         labels:[],
+            //         datasets:[]
+            //     },
+            //     options:{
+            //         scales:{
+            //             y:{
+            //                 beginAtZero:false
+            //             }
+            //         }
+            //     }
 
-            });
-            const obvCtx = document.getElementById('obvChart');
-            const obvLineChart = new Chart(obvCtx,{
-                type:'line',
-                data:{
-                    labels:[],
-                    datasets:[]
-                },
-                options:{
-                    scales:{
-                        y:{
-                            beginAtZero:false
-                        }
-                    }
-                }
+            // });
+            // const obvCtx = document.getElementById('obvChart');
+            // const obvLineChart = new Chart(obvCtx,{
+            //     type:'line',
+            //     data:{
+            //         labels:[],
+            //         datasets:[]
+            //     },
+            //     options:{
+            //         scales:{
+            //             y:{
+            //                 beginAtZero:false
+            //             }
+            //         }
+            //     }
 
-            });
+            // });
 
-            const macdCtx = document.getElementById('macdChart');
-            const macdBarChart = new Chart(macdCtx,{
-                type:'bar',
-                data:{
-                    labels:[],
-                    datasets:[]
-                },
-                options:{
-                    scales:{
-                        y:{
-                            beginAtZero:false
-                        }
-                    }
-                }
+            // const macdCtx = document.getElementById('macdChart');
+            // const macdBarChart = new Chart(macdCtx,{
+            //     type:'bar',
+            //     data:{
+            //         labels:[],
+            //         datasets:[]
+            //     },
+            //     options:{
+            //         scales:{
+            //             y:{
+            //                 beginAtZero:false
+            //             }
+            //         }
+            //     }
 
-            });
+            // });
 
             //Function to populate the Dropdown with options
             function populateDropdown(){
@@ -132,10 +133,17 @@
                     //Display the JSON response
 
                     // document.getElementById("jsonData").innerText = JSON.stringify(json,null,2);
-                    console.log(json.macd);
+                    // console.log(json.macd);
+                    const lineChart = createChart('lineChart','line');
                     drawChart(lineChart,json.main_data);
+
+
+                    const obvLineChart = createChart('obvChart', 'line');
                     drawChart(obvLineChart,json.obv);
-                    drawChart(macdBarChart,json.macd);
+
+                    // Example usage:
+                    const macdChart = createChart('macdChart', 'bar');
+                    drawChart(macdChart,json.macd);
                     
 
 
@@ -161,6 +169,8 @@
         const title = jsonData.title;
         const labels = jsonData.data.labels;
         const datasets = jsonData.data.datasets;
+        // const chartType = jsonData.data.datasets[0].type;
+        // console.log(chartType)
 
          // Reset the current chart
          chart.data.datasets = [];
@@ -170,15 +180,55 @@
         chart.data.labels = labels;
 
         datasets.forEach((dataset,index)=>{
+            const chartType = dataset.type;
             chart.data.datasets.push({
+                
+
                 label:dataset.label,
                 data:dataset.data,
-                borderWidth:3,
-                fill:false
+                borderWidth:1,
+                fill:false,
+                type:chartType
             });
         });
         chart.update();
     }
+
+    function createChart(elementId, chartType) {
+    const ctx = document.getElementById(elementId);
+
+    if (!ctx) {
+        console.error(`Element with ID '${elementId}' not found.`);
+        return;
+    }
+    // Destroy existing chart if it exists
+    // Check if a chart already exists
+    const existingChart = Chart.getChart(ctx);
+    if (existingChart) {
+        existingChart.destroy();
+    }
+
+
+    const chart = new Chart(ctx, {
+        type: chartType,
+        data: {
+            labels: [],
+            datasets: []
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+
+    return chart;
+}
+
+    
+
 
 
 

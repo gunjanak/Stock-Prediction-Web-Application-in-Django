@@ -17,8 +17,8 @@ def nepse_symbols_view(request):
 def stock_dataFrame_view(request,symbol):
     df = stock_dataFrame(symbol)
     print("**************************************************")
-    df = df.head(100)
-    # print(df)
+    # df = df.head(100)
+    print(df)
 
     #the df with OBV
     
@@ -62,7 +62,9 @@ def stock_dataFrame_view(request,symbol):
             "labels":date,
             "datasets":[{
                 "label":"OBV",
-                "data":obv
+                "data":obv,
+                "type":"line"
+
 
             }
                 

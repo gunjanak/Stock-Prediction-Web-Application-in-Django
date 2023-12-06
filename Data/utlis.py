@@ -134,18 +134,43 @@ def MACD(company_df):
   mach_hist_df['Date'] = mach_hist_df['timestamp'].dt.date
   mach_hist_df = mach_hist_df[['Date','MACD_hist']]
 
+  # Macd main line
+  macd_main = list(company_df2['MACD'].values)
+  print(macd_main)
+
+
   # print(mach_hist_df)
   date = list(mach_hist_df['Date'].values)
   macd_hist = list(mach_hist_df['MACD_hist'].values)
+  print(macd_hist)
+
+  MACD_main_dic = {
+     "title":"MACD",
+     "data":{
+        "labels":date,
+        "datasets":[{
+           "label":"macd_main",
+           "data":macd_main,
+           "type":"line"
+        },
+        {
+           "label":"macd_hist",
+            "data":macd_hist,
+            "type":"bar"
+        }]
+     }
+  }
 
 
-  MACD_data = {
-        "title":"MACD",
+  MACD_hist_dic = {
+        "title":"MACD hist",
         "data":{
             "labels":date,
             "datasets":[{
                 "label":"macd",
-                "data":macd_hist
+                "data":macd_hist,
+                "type":"bar"
+
 
             }
                 
@@ -153,7 +178,11 @@ def MACD(company_df):
         }
         
     }
-  print(MACD_data)
-  # company_df2['Difference'] = company_df2['MACD'] - company_df2['MACD_signal']
-  # company_df4 = company_df2[['Close','Difference']]
-  return MACD_data
+  
+  MACD_dic = {
+     "MACD_main":MACD_main_dic,
+     "MACD_hist":MACD_hist_dic
+  }
+  
+
+  return MACD_main_dic
