@@ -3,6 +3,7 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import requests
 import re
+import talib as ta
 
 
 import pandas as pd
@@ -107,5 +108,52 @@ def OBV(company_df):
         inplace=True)
   
   company_df2['OBV'] = obv_daily
+  df_obv = company_df2[['OBV']]
+  # print(df_obv)
+  obv = df_obv.values
+  obv = list(df_obv.values)
+  obv = [item.item() for array in obv for item in array]
+  # print(obv)
+  # print(type(obv[0]))
   #print(len(company_df2))
-  return company_df2
+  return obv
+
+
+def MACD(company_df):
+  macd, macdsignal, macdhist = ta.MACD(company_df['Close'], fastperiod=12, slowperiod=26, signalperiod=9)
+
+  # print(macdhist.values)
+  company_df['MACD'] = macd
+  company_df['MACD_signal'] = macdsignal
+  company_df['MACD_hist'] = macdhist
+  company_df2 = company_df.dropna()
+
+  mach_hist_df = company_df2[['MACD_hist']]
+  mach_hist_df = mach_hist_df.reset_index()
+  mach_hist_df['timestamp'] = pd.to_datetime(mach_hist_df['Date'])
+  mach_hist_df['Date'] = mach_hist_df['timestamp'].dt.date
+  mach_hist_df = mach_hist_df[['Date','MACD_hist']]
+
+  # print(mach_hist_df)
+  date = list(mach_hist_df['Date'].values)
+  macd_hist = list(mach_hist_df['MACD_hist'].values)
+
+
+  MACD_data = {
+        "title":"MACD",
+        "data":{
+            "labels":date,
+            "datasets":[{
+                "label":"macd",
+                "data":macd_hist
+
+            }
+                
+            ]
+        }
+        
+    }
+  print(MACD_data)
+  # company_df2['Difference'] = company_df2['MACD'] - company_df2['MACD_signal']
+  # company_df4 = company_df2[['Close','Difference']]
+  return MACD_data

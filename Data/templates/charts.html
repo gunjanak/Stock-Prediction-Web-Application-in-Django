@@ -28,6 +28,7 @@
 
         <canvas id="lineChart" width="300" height="100"></canvas>
         <canvas id="obvChart" width="300" height="100"></canvas>
+        <canvas id="macdChart" width="300" height="100"></canvas>
        
         
 
@@ -56,6 +57,23 @@
             const obvCtx = document.getElementById('obvChart');
             const obvLineChart = new Chart(obvCtx,{
                 type:'line',
+                data:{
+                    labels:[],
+                    datasets:[]
+                },
+                options:{
+                    scales:{
+                        y:{
+                            beginAtZero:false
+                        }
+                    }
+                }
+
+            });
+
+            const macdCtx = document.getElementById('macdChart');
+            const macdBarChart = new Chart(macdCtx,{
+                type:'bar',
                 data:{
                     labels:[],
                     datasets:[]
@@ -114,9 +132,10 @@
                     //Display the JSON response
 
                     // document.getElementById("jsonData").innerText = JSON.stringify(json,null,2);
-                   
-                    drawLineChart(lineChart,json.main_data);
-                    drawObvChart(obvLineChart,json.obv);
+                    console.log(json.macd);
+                    drawChart(lineChart,json.main_data);
+                    drawChart(obvLineChart,json.obv);
+                    drawChart(macdBarChart,json.macd);
                     
 
 
@@ -137,7 +156,7 @@
 
   
 
-    function drawLineChart(chart,jsonData){
+    function drawChart(chart,jsonData){
         console.log("Rendering chart");
         const title = jsonData.title;
         const labels = jsonData.data.labels;
@@ -163,30 +182,7 @@
 
 
 
-    function drawObvChart(chart,jsonData){
-        console.log("Rendering chart");
-        const title = jsonData.title;
-        const labels = jsonData.data.labels;
-        const datasets = jsonData.data.datasets;
-
-         // Reset the current chart
-         chart.data.datasets = [];
-            chart.data.labels = [];
-
-        // chart.options.title.text = title;
-        chart.data.labels = labels;
-       
-
-        datasets.forEach((dataset,index)=>{
-            chart.data.datasets.push({
-                label:dataset.label,
-                data:dataset.data,
-                borderWidth:3,
-                fill:false
-            });
-        });
-        chart.update();
-    }
+   
 
     
   </script>

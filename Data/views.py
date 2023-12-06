@@ -3,7 +3,7 @@ import pandas as pd
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from Data.utlis import nepse_symbols,custom_business_week_mean,stock_dataFrame,OBV
+from Data.utlis import nepse_symbols,custom_business_week_mean,stock_dataFrame,OBV,MACD
 
 
 # Create your views here.
@@ -17,19 +17,16 @@ def nepse_symbols_view(request):
 def stock_dataFrame_view(request,symbol):
     df = stock_dataFrame(symbol)
     print("**************************************************")
-    df = df.head(50)
+    df = df.head(100)
     # print(df)
 
     #the df with OBV
     
-    df_obv = OBV(df)
-    df_obv = df_obv[['OBV']]
-    print(df_obv)
-    obv = df_obv.values
-    obv = list(df_obv.values)
-    obv = [item.item() for array in obv for item in array]
-    print(obv)
-    print(type(obv[0]))
+    obv = OBV(df)
+
+    #MACD
+    MACD_data = MACD(df) 
+    # print(macd_df)
 
 
     df = df.reset_index()
@@ -47,7 +44,7 @@ def stock_dataFrame_view(request,symbol):
     final_list_of_dicts = [{"label": column, "data": values} for column, values in list_of_dicts.items()]
 
     # Display the final list of dictionaries
-    print(final_list_of_dicts)
+    # print(final_list_of_dicts)
 
 
 
@@ -76,7 +73,8 @@ def stock_dataFrame_view(request,symbol):
     
     context = {
         "main_data":main_data,
-        "obv":OBV_data
+        "obv":OBV_data,
+        "macd":MACD_data
     }
 
     # print(context)
