@@ -138,6 +138,9 @@ def MACD(company_df):
   macd_main = list(company_df2['MACD'].values)
   print(macd_main)
 
+  #MACD signal line
+  macd_signal_line = list(company_df2['MACD_signal'].values)
+
 
   # print(mach_hist_df)
   date = list(mach_hist_df['Date'].values)
@@ -157,6 +160,12 @@ def MACD(company_df):
            "label":"macd_hist",
             "data":macd_hist,
             "type":"bar"
+        },
+        {
+            "label":"macd_hist",
+            "data":macd_signal_line,
+            "type":"line"
+           
         }]
      }
   }
