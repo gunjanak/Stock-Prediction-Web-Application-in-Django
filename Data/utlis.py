@@ -136,7 +136,7 @@ def MACD(company_df):
 
   # Macd main line
   macd_main = list(company_df2['MACD'].values)
-  print(macd_main)
+  # print(macd_main)
 
   #MACD signal line
   macd_signal_line = list(company_df2['MACD_signal'].values)
@@ -145,7 +145,7 @@ def MACD(company_df):
   # print(mach_hist_df)
   date = list(mach_hist_df['Date'].values)
   macd_hist = list(mach_hist_df['MACD_hist'].values)
-  print(macd_hist)
+  # print(macd_hist)
 
   MACD_main_dic = {
      "title":"MACD",
@@ -171,27 +171,6 @@ def MACD(company_df):
   }
 
 
-  MACD_hist_dic = {
-        "title":"MACD hist",
-        "data":{
-            "labels":date,
-            "datasets":[{
-                "label":"macd",
-                "data":macd_hist,
-                "type":"bar"
-
-
-            }
-                
-            ]
-        }
-        
-    }
-  
-  MACD_dic = {
-     "MACD_main":MACD_main_dic,
-     "MACD_hist":MACD_hist_dic
-  }
   
 
   return MACD_main_dic

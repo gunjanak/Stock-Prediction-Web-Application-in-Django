@@ -17,8 +17,8 @@ def nepse_symbols_view(request):
 def stock_dataFrame_view(request,symbol):
     df = stock_dataFrame(symbol)
     print("**************************************************")
-    # df = df.head(100)
-    print(df)
+    df = df.head(50)
+    # print(df)
 
     #the df with OBV
     
@@ -34,6 +34,20 @@ def stock_dataFrame_view(request,symbol):
     df['timestamp'] = pd.to_datetime(df['Date'])
     df['Date'] = df['timestamp'].dt.date
     df = df[['Date','Close','Open','High',"Low"]]
+    # print(df)
+
+    #Transforming data suitable for candlestick chart
+    transformed_data = {
+    'dataPoints': [
+        {'x': date.strftime('%Y-%m-%d'), 'y': [row.Open, row.High, row.Low, row.Close]}
+        for date, row in zip(df['Date'], df.itertuples(index=False))
+    ]
+    }
+
+    # print(transformed_data)
+
+
+
     date = list(df['Date'].values)
     new_df = df.iloc[:, 1:] 
     # print(new_df)
@@ -45,6 +59,7 @@ def stock_dataFrame_view(request,symbol):
 
     # Display the final list of dictionaries
     # print(final_list_of_dicts)
+    print(date)
 
 
 
@@ -76,7 +91,8 @@ def stock_dataFrame_view(request,symbol):
     context = {
         "main_data":main_data,
         "obv":OBV_data,
-        "macd":MACD_data
+        "macd":MACD_data,
+        "candlestick":transformed_data
     }
 
     # print(context)
@@ -86,3 +102,6 @@ def stock_dataFrame_view(request,symbol):
 
 def charts_view(request):
     return render(request,"charts.html")
+
+def candlestick_view(request):
+    return render(request,"candlestick.html")
