@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Forecast 
+        </title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+    </head>
+
+    <body>
+        <h1>Stock Forecast</h1>
+        
+        <form method="post" action="{% url 'forecast_view'%}">
+            {% csrf_token %}
+            {{form.as_p}}
+            <input type="submit" value="submit">
+           
+        </form>
+        {% if chartData %}
+            
+            
+            <canvas id="lineChart" width="300" height="100"></canvas>
+
+
+            <script>
+               
+                console.log({{chartData|safe}});
+                //Extract the data from the context
+                var chartData = {{ chartData|safe }};
+                
+
+                const lineChart = createChart('lineChart','line');
+                drawChart(lineChart,chartData);
+
+
+                
+                
+
+
+
+    function createChart(elementId, chartType) {
+        console.log("Creating chart")
+    const ctx = document.getElementById(elementId);
+
+    if (!ctx) {
+        console.error(`Element with ID '${elementId}' not found.`);
+        return;
+    }
+    // Destroy existing chart if it exists
+    // Check if a chart already exists
+    const existingChart = Chart.getChart(ctx);
+    if (existingChart) {
+        existingChart.destroy();
+    }
+
+
+                const chart = new Chart(ctx, {
+                    type: chartType,
+                    data: {
+                        labels: [],
+                        datasets: []
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+
+                return chart;
+            }
+
+
+            function drawChart(chart,jsonData){
+        console.log("Rendering chart");
+        const title = jsonData.title;
+        const labels = jsonData.data.labels;
+        const datasets = jsonData.data.datasets;
+        // const chartType = jsonData.data.datasets[0].type;
+        // console.log(chartType)
+
+         // Reset the current chart
+         chart.data.datasets = [];
+            chart.data.labels = [];
+
+        // chart.options.title.text = title;
+        chart.data.labels = labels;
+
+        datasets.forEach((dataset,index)=>{
+            const chartType = dataset.type;
+            chart.data.datasets.push({
+                
+
+                label:dataset.label,
+                data:dataset.data,
+                borderWidth:1,
+                fill:false,
+                type:chartType
+            });
+        });
+        chart.update();
+    }
+
+
+
+
+
+            </script>
+
+
+        {% endif %}
+
+    </body>
+</html>

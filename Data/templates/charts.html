@@ -91,9 +91,11 @@
                    //console.log(json.main_data.datasets);
                     const lineChart = createChart('lineChart','line');
                     drawChart(lineChart,json.main_data);
-                    const inputData = json.main_data.data.datasets;
+                    var inputData = json.main_data.data.datasets;
+                    var dateStrings = json.main_data.data.labels;
+                    
 
-                    // Assuming that the data arrays have the same length
+                //     // Assuming that the data arrays have the same length
                 var transformedData = [];
 
                 for (var i = 0; i < inputData[0].data.length; i++) {
@@ -117,8 +119,15 @@
                     transformedData.push(dataPoint);
                 }
                 console.log(transformedData)
+                var jsonData = JSON.stringify(transformedData, null, 2);
+                console.log(jsonData);
+                // Filter out data points with missing x or y values
+                transformedData = transformedData.filter(function(dataPoint) {
+                    return dataPoint.x && dataPoint.y && dataPoint.y.length === 4;
+                });
+                // Find the dates that have data
 
-
+    
                 // Now, 'transformedData' is suitable for a Candlestick chart in CanvasJS
                 
 
@@ -220,7 +229,7 @@
 
 function createCandleStickChart(transformedData){
     console.log("Transformed data");
-    console.log(transformedData);
+    // console.log(transformedData);
 
     
     var chart = new CanvasJS.Chart("chartContainer",
@@ -243,16 +252,7 @@ function createCandleStickChart(transformedData){
 		{
 			type: "candlestick",
 			dataPoints: [   
-            {x: new Date(2023,0,30),y:[798, 729, 859, 785]},
-            {x: new Date(2023,0,31),y:[798, 829, 759, 785]},
-            {x: new Date(2023,1,1),y:[888, 729, 759, 785]},     
-            {x: new Date(2023,01,02),y:[760, 830, 746, 795]}, 
-            {x: new Date(2023,01,03),y:[795.0, 820.0, 788.0, 802.0]}, 
-            {x: new Date(2023,01,04),y:[802.0, 882.2, 803.0, 880.0]}, 
-            {x: new Date(2023,01,05),y:[880.0, 900.0, 863.0, 878.0]}, 
-            {x: new Date(2023,01,06),y:[878.0, 899.0, 861.0, 887.0]},
-            {x: new Date(2023,01,07),y:[887.0, 900.0, 875.0, 890.8]}, 
-            {x: new Date(2023,01,08),y:[890.8, 906.7, 870.0, 870.0]} 
+            
 			]
 		}
 		]

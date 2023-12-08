@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Candlestick Chart</title>
-    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <!-- <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script> -->
+
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="https://cdn.canvasjs.com/canvasjs.stock.min.js"></script>
 </head>
 <body>
 
@@ -14,7 +17,7 @@
     <script>
         // Your JavaScript code for creating the candlestick chart will go here
         window.onload = function () {
-    var dataPoints = [
+    var dataP = [
         { x: new Date(2023, 0, 1), y: [32, 45, 30, 40] },
         { x: new Date(2023, 0, 2), y: [40, 50, 38, 45] },
         { x: new Date(2023, 0, 3), y: [35, 45, 32, 40] },
@@ -22,23 +25,44 @@
         { x: new Date(2023, 0, 5), y: [35, 85, 32, 40] },
         { x: new Date(2023, 0, 6), y: [35, 45, 65, 40] },
         { x: new Date(2023, 0, 7), y: [35, 45, 32, 45] },
+        { x: new Date(2023, 0, 10), y: [25, 45, 42, 55] }
         // Add more data points as needed
     ];
 
     var chart = new CanvasJS.Chart("candlestickChartContainer", {
+        theme:"light2",
         title: {
             text: "Candlestick Chart"
         },
-        axisX: {
-            valueFormatString: "DD-MMM-YYYY"
+        subtitiles : [{
+            text:"fuck"
+        }],
+        
+      data: [{
+        type: "candlestick",
+        yValueFormatString: "$#,###.##",
+        dataPoints : dataP
+      }],
+      rangeSelector:{
+        enabled: true,
+        inputFields:{
+            unit:"day",
+            inputFormat:"DD-MMM-YYYY",
+            minDate:dataP[0].x,
+            maxDate:dataP[dataP.length -1 ].x,
+
         },
-        axisY: {
-            title: "Price"
-        },
-        data: [{
-            type: "candlestick",
-            dataPoints: dataPoints
-        }]
+        buttons:[{
+            label:"1 day",
+            range:1,
+            unit:"day"
+        }
+    ]
+      }
+
+
+        
+        
     });
 
     chart.render();

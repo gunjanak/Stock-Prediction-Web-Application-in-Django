@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import requests
 import re
 import talib as ta
+import json
 
 
 import pandas as pd
@@ -174,3 +175,49 @@ def MACD(company_df):
   
 
   return MACD_main_dic
+
+
+
+def processData(dataFrame,frequency):
+  if frequency == "weekly":
+    print("Weekly data**********************************")
+    df = dataFrame.resample('W-FRI').mean()
+  else:
+    df = dataFrame
+
+  df = df.dropna()
+  # df = df.head()
+  df = df.reset_index()
+  df['timestamp'] = pd.to_datetime(df['Date'])
+  df['Date'] = df['timestamp'].dt.date
+  date = list(df['Date'].values)
+  df.drop('timestamp', axis=1, inplace=True)
+
+  new_df = df.iloc[:, 1:] 
+
+  # print(new_df)
+  print("***************date**********************")
+  print(date)
+
+
+  list_of_dicts = new_df.to_dict(orient='list')
+  # Create the final list of dictionaries with the desired format
+  final_list_of_dicts = [{"label": column, "data": values}
+                          for column, values in list_of_dicts.items()]
+  main_data = {
+        "title":"Stock Price",
+        "data":{
+            "labels":date,
+            "datasets":final_list_of_dicts
+        }
+    }
+  
+  # Convert date objects to string representations
+  main_data['data']['labels'] = [str(d) for d in main_data['data']['labels']]
+
+  # Convert data to a JSON-formatted string
+  chart_data_json = json.dumps(main_data)
+  # print(main_data)
+
+  return main_data
+   

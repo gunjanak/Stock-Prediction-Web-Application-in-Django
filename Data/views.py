@@ -3,8 +3,9 @@ import pandas as pd
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from Data.utlis import nepse_symbols,custom_business_week_mean,stock_dataFrame,OBV,MACD
-
+from Data.utlis import (nepse_symbols,custom_business_week_mean,
+                        stock_dataFrame,OBV,MACD,processData)
+from Data.forms import ForecastForm
 
 # Create your views here.
 def nepse_symbols_view(request):
@@ -17,7 +18,7 @@ def nepse_symbols_view(request):
 def stock_dataFrame_view(request,symbol):
     df = stock_dataFrame(symbol)
     print("**************************************************")
-    df = df.head(50)
+    df = df.head(5)
     # print(df)
 
     #the df with OBV
@@ -59,7 +60,8 @@ def stock_dataFrame_view(request,symbol):
 
     # Display the final list of dictionaries
     # print(final_list_of_dicts)
-    print(date)
+    # print("***************date**********************")
+    # print(date)
 
 
 
@@ -105,3 +107,59 @@ def charts_view(request):
 
 def candlestick_view(request):
     return render(request,"candlestick.html")
+
+def forecast_view(request):
+
+    #this gives list of all the symbols
+    output = nepse_symbols()
+
+    #this gives list of all the columns
+    df = stock_dataFrame('ADBL')
+    df = df.head()
+    cols = list(df.columns)
+    
+    frequency = ["daily","weekly"]
+
+    data_to_chart = None
+
+
+    if request.method == "POST":
+        form = ForecastForm(request.POST,symbols=output,columns=cols,frequency=frequency)
+        if form.is_valid():
+            selected_symbol = form.cleaned_data['symbol_dropdown']
+            selected_column = form.cleaned_data['column_dropdown']
+            selected_freq = form.cleaned_data['frequency_dropdown']
+
+            df = stock_dataFrame(selected_symbol)
+            df = df[[selected_column]]
+            data_to_chart = processData(df,selected_freq)
+            # print(data_to_chart)
+            
+
+
+
+    else:
+        form = ForecastForm(symbols=output,columns=cols,frequency=frequency)
+
+
+
+
+    context = {
+        "symbols":output,
+        "columns":cols,
+        "form":form,
+        "chartData":data_to_chart,
+    }
+    # print(context)
+
+    return render(request,"forecast.html",context)
+
+
+
+
+
+
+
+
+
+
