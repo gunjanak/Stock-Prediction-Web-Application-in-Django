@@ -9,9 +9,22 @@
         <h1>
             Forecast
         </h1>
-        <p>
-            {{prediction}}
-        </p>
+        <form method="post" action="{% url 'cnn_bgru_view'%}">
+            {% csrf_token %}
+            {{form.as_p}}
+            <input type="submit" value="submit">
+           
+        </form>
+
+
+        {%if error %}
+            <p>Error: {{error}}</p>
+        {% endif %}
+
+        {% if prediction %}
+            <p>Prediction: {{prediction}}</p>
+
+        {% endif %}
 
     </body>
 </html>

@@ -7,7 +7,7 @@ from Data.utlis import (nepse_symbols,custom_business_week_mean,
                         stock_dataFrame,OBV,MACD,processData)
 from Data.forecast import (data_for_model,Model_CNN_BGRU,model_prediction,MAPE,final_prediction,stock_dataFrame2)
 
-from Data.forms import ForecastForm
+from Data.forms import ForecastForm,cnnBgruForm
 
 # Create your views here.
 def nepse_symbols_view(request):
@@ -161,28 +161,49 @@ def forecast_view(request):
 
 
 def cnn_bgru_view(request):
-    symbol = 'NTC'
+    output = nepse_symbols()
+    error = None
+    prediction = None
 
-    df = stock_dataFrame2(symbol)
-    print(df)
-    data = data_for_model(df)
-    X = data[1]
-    Y = data[2]
-    model_CNN_BGRU = Model_CNN_BGRU(X,Y,Look_back_period=5)
-    # print(model_CNN_BGRU.summary())
-    # model_name = symbol + '.h5'
-    # model_CNN_BGRU.save(model_name)
-    record = model_prediction(data,model_CNN_BGRU,df,Look_back_period=5,future=0)
-    print(record)
+    if request.method == "POST":
+        form = cnnBgruForm(request.POST,symbols=output)
+        if form.is_valid():
+            selected_symbol = form.cleaned_data['symbol_dropdown']
+            # selected_freq = form.cleaned_data['frequency_dropdown']
 
-    record = record.set_index('Date')
-    error = MAPE(record)
-    print(error)
-    lookback = 5
-    prediction = final_prediction(df,lookback,data,model_CNN_BGRU)
-    print(prediction)
+            df = stock_dataFrame2(selected_symbol)
+            print(df)
+            data = data_for_model(df)
+            X = data[1]
+            Y = data[2]
+            model_CNN_BGRU = Model_CNN_BGRU(X,Y,Look_back_period=5)
+            record = model_prediction(data,model_CNN_BGRU,
+                                      df,Look_back_period=5,future=0)
+            record = record.set_index('Date')
+            error = MAPE(record)
+            error = round(error, 3)
+            print("*******************Error********************")
+            print(error)
+            error = f"{error*100}  %"
+            lookback = 5
+            prediction = final_prediction(df,lookback,data,model_CNN_BGRU)
+            prediction = prediction[0][0]
+            print("***********Prediction*******************")
+            print(prediction)
+            
+
+    else:
+        form = cnnBgruForm(symbols=output)
     
-    return render(request,"cnn_bgru.html",{"prediction":prediction})
+    context = {
+        "symbols":output,
+        "form":form,
+        "error":error,
+        "prediction":prediction,
+    }
+    
+    
+    return render(request,"cnn_bgru.html",context)
 
 
 
