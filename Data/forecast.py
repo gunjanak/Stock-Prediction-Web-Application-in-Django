@@ -1,10 +1,10 @@
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
-from datatime import datetime, timedelta
+from datetime import datetime, timedelta
 import numpy as np
 from sklearn import preprocessing
-import pandas as pd
+
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
@@ -19,7 +19,7 @@ def custom_business_week_mean(values):
     return working_days.mean()
 
 #function to read stock data from Nepalipaisa.com api
-def stock_dataFrame(stock_symbol,start_date='2023-01-01',weekly=False):
+def stock_dataFrame2(stock_symbol,start_date='2023-01-01',weekly=False):
   """
   input : stock_symbol
             start_data set default at '2020-01-01'
@@ -109,6 +109,7 @@ def Model_CNN_BGRU(X,Y,Look_back_period):
   model = Sequential()
   model.add(Conv1D(100,(3),activation='relu',padding='same',input_shape=(Look_back_period,1)))
   model.add(MaxPooling1D(pool_size=2,strides=1,padding='valid'))
+  model.add(Bidirectional(GRU(50)))
   model.add(Dense(1))
   model.compile(loss='mean_squared_error',optimizer='adam',metrics=['accuracy'])
   model.fit(X,Y,epochs=100,batch_size=64,verbose=0)
@@ -125,9 +126,11 @@ def model_prediction(data,model,company_df,Look_back_period,future):
   std = mean_std[1]
   ran = company_df.shape[0]-(L+f)
   company_df = company_df.reset_index()
+  
 
   column_names = ["Date","Actual","Prediction"]
   record = pd.DataFrame(columns=column_names)
+ 
 
   for i in range(ran):
     count = i+L
@@ -135,6 +138,9 @@ def model_prediction(data,model,company_df,Look_back_period,future):
     tail = tail.set_index('Date')
     numpy_array = tail.values
     predict_input = np.zeros(shape=(1,L,1))
+    # print("*******************tail********************")
+    # print(tail)
+    
 
     for i in range(L):
       predict_input[:,i] = numpy_array[i]
@@ -150,9 +156,10 @@ def model_prediction(data,model,company_df,Look_back_period,future):
     actual = company_df['Close'][count]
     list_predict = [date,actual,predict_final[0][0]]
     series_predict = pd.Series(list_predict,index=record.columns)
-    record = record.append(series_predict,ignore_index=True)
+    record = pd.concat([record, pd.DataFrame([series_predict])], ignore_index=True)
+    # record = record.append(series_predict,ignore_index=True)
     record['Date'] = pd.to_datetime(record['Date'],infer_datetime_format=True)
-    # print(type(record['Date'][0]))
+   
 
   return record
 

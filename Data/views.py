@@ -5,6 +5,8 @@ from django.http import JsonResponse
 
 from Data.utlis import (nepse_symbols,custom_business_week_mean,
                         stock_dataFrame,OBV,MACD,processData)
+from Data.forecast import (data_for_model,Model_CNN_BGRU,model_prediction,MAPE,final_prediction,stock_dataFrame2)
+
 from Data.forms import ForecastForm
 
 # Create your views here.
@@ -158,6 +160,29 @@ def forecast_view(request):
 
 
 
+def cnn_bgru_view(request):
+    symbol = 'NTC'
+
+    df = stock_dataFrame2(symbol)
+    print(df)
+    data = data_for_model(df)
+    X = data[1]
+    Y = data[2]
+    model_CNN_BGRU = Model_CNN_BGRU(X,Y,Look_back_period=5)
+    # print(model_CNN_BGRU.summary())
+    # model_name = symbol + '.h5'
+    # model_CNN_BGRU.save(model_name)
+    record = model_prediction(data,model_CNN_BGRU,df,Look_back_period=5,future=0)
+    print(record)
+
+    record = record.set_index('Date')
+    error = MAPE(record)
+    print(error)
+    lookback = 5
+    prediction = final_prediction(df,lookback,data,model_CNN_BGRU)
+    print(prediction)
+    
+    return render(request,"cnn_bgru.html",{"prediction":prediction})
 
 
 
