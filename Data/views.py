@@ -5,7 +5,8 @@ from django.http import JsonResponse
 
 from Data.utlis import (nepse_symbols,custom_business_week_mean,
                         stock_dataFrame,OBV,MACD,processData)
-from Data.forecast import (data_for_model,Model_CNN_BGRU,model_prediction,MAPE,final_prediction,stock_dataFrame2)
+from Data.forecast import (data_for_model,Model_CNN_BGRU,model_prediction,
+                           MAPE,final_prediction,stock_dataFrame2)
 
 from Data.forms import ForecastForm,cnnBgruForm
 
@@ -134,6 +135,8 @@ def forecast_view(request):
 
             df = stock_dataFrame(selected_symbol)
             df = df[[selected_column]]
+            # print("$$$$$$$$$$$$$$$$$$4this$$$$$$$$$$4444")
+            # print(df)
             data_to_chart = processData(df,selected_freq)
             # print(data_to_chart)
             
@@ -164,42 +167,66 @@ def cnn_bgru_view(request):
     output = nepse_symbols()
     error = None
     prediction = None
+    frequency = ["daily","weekly"]
+    data_to_chart = None
 
     if request.method == "POST":
-        form = cnnBgruForm(request.POST,symbols=output)
+        form = cnnBgruForm(request.POST,symbols=output,frequency=frequency)
         if form.is_valid():
             selected_symbol = form.cleaned_data['symbol_dropdown']
-            # selected_freq = form.cleaned_data['frequency_dropdown']
+            selected_freq = form.cleaned_data['frequency_dropdown']
+
+            if selected_freq == 'weekly':
+                lookback_period = 50
+                future = 6
+            else:
+                lookback_period = 5
+                future = 0
 
             df = stock_dataFrame2(selected_symbol)
             print(df)
-            data = data_for_model(df)
+            data = data_for_model(df,Look_back_period=lookback_period,future=future)
             X = data[1]
             Y = data[2]
-            model_CNN_BGRU = Model_CNN_BGRU(X,Y,Look_back_period=5)
+
+
+            model_CNN_BGRU = Model_CNN_BGRU(X,Y,Look_back_period=lookback_period)
             record = model_prediction(data,model_CNN_BGRU,
-                                      df,Look_back_period=5,future=0)
+                                      df,Look_back_period=lookback_period,future=future)
             record = record.set_index('Date')
+           
+
             error = MAPE(record)
-            error = round(error, 3)
-            print("*******************Error********************")
-            print(error)
-            error = f"{error*100}  %"
+            error = round(error*100, 3)
+           
+            error = f"{error}  %"
             lookback = 5
             prediction = final_prediction(df,lookback,data,model_CNN_BGRU)
             prediction = prediction[0][0]
-            print("***********Prediction*******************")
-            print(prediction)
+            prediction = round(prediction,0)
+            # print("***********Prediction*******************")
+            # print(f"{future}: {prediction}")
+
+            #Sending data to get data ready to plot
+            df_record = record[['Actual','Prediction']]
+            data_to_chart = processData(df_record,selected_freq)
+            print(data_to_chart)
+            # print("*********************Record***************************")
+            # print(record)
+
+
+
             
 
     else:
-        form = cnnBgruForm(symbols=output)
+        form = cnnBgruForm(symbols=output,frequency=frequency)
     
     context = {
         "symbols":output,
         "form":form,
         "error":error,
         "prediction":prediction,
+        "chartData":data_to_chart,
     }
     
     
